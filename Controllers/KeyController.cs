@@ -4,6 +4,8 @@ using XrayServerAPI.InstallXray;
 
 namespace XrayServerAPI.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class KeyController : Controller
 {
     public KeyController()

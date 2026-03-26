@@ -4,10 +4,11 @@ using System.IO;
 
 namespace XrayServerAPI.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class HomeController : Controller
 {
-    [HttpGet("install")]
-    public IActionResult Install()
+    public HomeController()
     {
         if (!System.IO.File.Exists("installed.flag"))
         {
@@ -15,6 +16,5 @@ public class HomeController : Controller
             new InstallXrayManager(domain).Install();
             System.IO.File.WriteAllText("installed.flag", "ok");
         }
-        return Ok("Installed");
     }
 }
