@@ -1,3 +1,4 @@
+using XrayServerAPI.Install;
 using XrayServerAPI.InstallXray;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,5 +25,8 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.MapGet("/", () => "OK");
+
+var caddyStarter = new CaddyStarter("nl3.divpn.ru");
+caddyStarter.Start();
 
 app.Run();

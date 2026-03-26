@@ -29,7 +29,7 @@ public class InstallXrayManager
 
     private Process GetInstallCertProc(string domain)
     {
-        var certScriptPath = Path.Combine(AppContext.BaseDirectory, "InstallXray", "InstallCert.bash");
+        var certScriptPath = Path.Combine(AppContext.BaseDirectory, "Install", "InstallCert.bash");
         Process instCert = new Process
         {
             StartInfo = new ProcessStartInfo
@@ -46,11 +46,7 @@ public class InstallXrayManager
 
     private Process GetInstallXrayProc(string domain)
     {
-        var scriptPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "InstallXray",
-            "InstallXray.bash"
-        );
+        var scriptPath = Path.Combine(AppContext.BaseDirectory, "Install", "InstallXray.bash");
 
         return new Process
         {
