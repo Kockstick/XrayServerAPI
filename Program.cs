@@ -23,4 +23,6 @@ app.UseStaticFiles();
 
 app.MapControllers();
 
+app.MapGet("/", () => "OK");
+
 app.Run();
