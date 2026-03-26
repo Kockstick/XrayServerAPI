@@ -23,6 +23,7 @@ public class InstallXrayManager
         catch(Exception ex)
         {
             Console.WriteLine("Error installing Xray: " + ex.Message);
+            throw new Exception("Error installing Xray: ", ex);
         }
     }
 
