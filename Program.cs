@@ -23,8 +23,4 @@ app.UseStaticFiles();
 
 app.MapControllers();
 
-var domain = "nl3.divpn.ru";
-InstallXrayManager installer = new InstallXrayManager(domain);
-installer.Install();
-
 app.Run();
