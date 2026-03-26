@@ -54,8 +54,7 @@ echo "== Starting Caddy =="
 
 docker run -d \
   --name caddy \
-  -p 80:80 \
-  -p 443:443 \
+  --network host \
   -v ${CADDY}/Caddyfile:/etc/caddy/Caddyfile:ro \
   -v ${CADDY}/caddy_data:/data \
   -v ${CADDY}/caddy_config:/config \
