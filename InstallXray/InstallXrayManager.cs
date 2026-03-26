@@ -5,13 +5,18 @@ namespace XrayServerAPI.InstallXray;
 
 public class InstallXrayManager
 {
+    private readonly string DOMAIN;
+    public InstallXrayManager(string domain)
+    {
+        DOMAIN = domain;
+    }
+
     public void Install()
     {
         try
         {
-            var domain = "nl3.divpn.ru";
-            ExecBash(GetInstallCertProc(domain));
-            ExecBash(GetInstallXrayProc(domain));
+            ExecBash(GetInstallCertProc(DOMAIN));
+            ExecBash(GetInstallXrayProc(DOMAIN));
         }
         catch(Exception ex)
         {

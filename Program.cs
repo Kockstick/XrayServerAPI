@@ -1,3 +1,5 @@
+using XrayServerAPI.InstallXray;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -22,3 +24,7 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.Run();
+
+var domain = "nl3.divpn.ru";
+InstallXrayManager installer = new InstallXrayManager(domain);
+installer.Install();
