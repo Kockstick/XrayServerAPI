@@ -15,8 +15,10 @@ public class InstallXrayManager
     {
         try
         {
+            Console.WriteLine("Starting Xray installation...");
             ExecBash(GetInstallCertProc(DOMAIN));
             ExecBash(GetInstallXrayProc(DOMAIN));
+            Console.WriteLine("Xray installation completed successfully.");
         }
         catch(Exception ex)
         {
