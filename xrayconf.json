@@ -1,0 +1,100 @@
+{
+  "log": {
+    "loglevel": "warning",
+    "access": "/home/vpsadmin/xray_log/access.log",
+    "error": "/home/vpsadmin/xray_log/error.log"
+  },
+
+  "dns": {
+    "servers": [
+      "https+local://1.1.1.1/dns-query",
+      "localhost"
+    ]
+  },
+
+  "routing": {
+    "rules": [
+      {
+        "inboundTag": [
+          "dokodemo-in"
+        ],
+        "domain": [
+          "speed.cloudflare.com"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "inboundTag": [
+          "dokodemo-in"
+        ],
+        "outboundTag": "block"
+      }
+    ]
+  },
+
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "tag": "dokodemo-in",
+      "port": 4431,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "speed.cloudflare.com",
+        "port": 443,
+        "network": "tcp"
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "tls"
+        ],
+        "routeOnly": true
+      }
+    },
+    {
+      "listen": "0.0.0.0",
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          { "id": "CLIENT_UUID" }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "dest": "127.0.0.1:4431",
+          "serverNames": [
+            "speed.cloudflare.com"
+          ],
+          "privateKey": "PRIVATE_KEY",
+          "shortIds": [
+            "SHORT_ID"
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ],
+        "routeOnly": true
+      }
+    }
+  ],
+
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
+}
