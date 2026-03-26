@@ -1,10 +1,9 @@
 #!/bin/bash
 
 DOMAIN=$1
-MAIN="/home/xrayapi/app"
-WEBROOT="${MAIN}/out/wwwroot"
+MAIN="/home/XrayServerAPI/out"
+WEBROOT="${MAIN}/wwwroot"
 CERT_DIR="$HOME/.acme.sh/${DOMAIN}_ecc"
-CERT_INSTALL_DIR="${MAIN}/certs/${DOMAIN}"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'

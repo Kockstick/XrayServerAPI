@@ -2,14 +2,13 @@
 
 DOMAIN=$1
 
-MAIN="/home/xrayapi/app"
-XRAY_CONFIG_SOURCE="${MAIN}/xrayconfig.json"
-XRAY_CONFIG_DEST="${MAIN}/xrayconf.json"
+MAIN="/home/XrayServerAPI/out"
+XRAY_CONFIG="${MAIN}/xrayconf.json"
 
 CERT_DIR="${MAIN}/cert"
 LOG_DIR="${MAIN}/logs"
 DATA_FILE="${MAIN}/data/xray_data.json"
-TMP_CONFIG="${MAIN}/config.tmp.json"
+TMP_CONFIG="${MAIN}/xrayconf.tmp.json"
 
 mkdir -p "$CERT_DIR"
 mkdir -p "$LOG_DIR"
@@ -35,8 +34,6 @@ fi
 
 echo -e "${YELLOW}Preparing directories...${NC}"
 
-mkdir -p "$CERT_DIR"
-mkdir -p "$LOG_DIR"
 touch "$LOG_DIR/access.log" "$LOG_DIR/error.log"
 chmod a+w "$LOG_DIR/"*.log
 
@@ -76,13 +73,13 @@ EOF
 
 echo -e "${YELLOW}Preparing config...${NC}"
 
-cp "$XRAY_CONFIG_SOURCE" "$TMP_CONFIG"
+cp "$XRAY_CONFIG" "$TMP_CONFIG"
 
 sed -i "s|SHORT_ID|$SHORT_ID|g" "$TMP_CONFIG"
 sed -i "s|PRIVATE_KEY|$PRIVATE_KEY|g" "$TMP_CONFIG"
 sed -i "s|CLIENT_UUID|$TEMP_UUID|g" "$TMP_CONFIG"
 
-sudo mv "$TMP_CONFIG" "$XRAY_CONFIG_DEST"
+sudo mv "$TMP_CONFIG" "$XRAY_CONFIG"
 
 echo -e "${YELLOW}Restarting Xray...${NC}"
 sudo systemctl restart xray
