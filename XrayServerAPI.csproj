@@ -17,8 +17,4 @@
 	  </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\.well-known\acme-challenge\" />
-  </ItemGroup>
-
 </Project>
