@@ -18,7 +18,12 @@ fi
 echo -e "${YELLOW}Setting up nginx...${NC}"
 
 # Установка nginx
+
+echo -e "${YELLOW}Freeing port 80...${NC}"
+sudo fuser -k 80/tcp || true
+
 sudo apt update && sudo apt install -y nginx
+sudo systemctl start nginx
 
 # Конфиг nginx
 NGINX_CONF="/etc/nginx/sites-available/${DOMAIN}"
@@ -43,6 +48,12 @@ if [ $? -ne 0 ]; then
 fi
 
 sudo systemctl reload nginx
+
+sudo systemctl is-active --quiet nginx
+if [ $? -ne 0 ]; then
+  echo -e "${RED}Nginx failed to start${NC}"
+  exit 1
+fi
 
 echo -e "${YELLOW}Checking certificate for $DOMAIN...${NC}"
 
