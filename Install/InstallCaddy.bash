@@ -50,6 +50,29 @@ if [ "$(docker ps -aq -f name=caddy)" ]; then
     docker rm caddy
 fi
 
+echo "== Freeing ports 80 and 443 =="
+
+# Убиваем nginx, если он есть
+if systemctl is-active --quiet nginx; then
+  echo "Stopping nginx..."
+  sudo systemctl stop nginx
+fi
+
+# На всякий случай прибиваем всё, что держит 80/443
+sudo fuser -k 80/tcp || true
+sudo fuser -k 443/tcp || true
+
+# Проверка (fail-fast, как ты любишь)
+if sudo ss -tulpn | grep -q ':80 '; then
+  echo "Port 80 is still in use. Exiting."
+  exit 1
+fi
+
+if sudo ss -tulpn | grep -q ':443 '; then
+  echo "Port 443 is still in use. Exiting."
+  exit 1
+fi
+
 echo "== Starting Caddy =="
 
 docker run -d \
