@@ -8,15 +8,5 @@ namespace XrayServerAPI.Controllers;
 [Route("[controller]")]
 public class HomeController : Controller
 {
-    [HttpGet("Install")]
-    public IActionResult Install()
-    {
-        if (!System.IO.File.Exists("installed.flag"))
-        {
-            var domain = "nl3.divpn.ru";
-            new InstallXrayManager(domain).Install();
-            System.IO.File.WriteAllText("installed.flag", "ok");
-        }
-        return Ok("Installed");
-    }
+
 }

@@ -40,7 +40,15 @@ app.MapControllers();
 
 app.MapGet("/", () => "OK");
 
-var caddyStarter = new CaddyStarter("nl3.divpn.ru");
+var domain = "nl3.divpn.ru";
+
+if (!File.Exists("installed.flag"))
+{
+    new InstallXrayManager(domain).Install();
+    File.WriteAllText("installed.flag", "ok");
+}
+
+var caddyStarter = new CaddyStarter(domain);
 caddyStarter.Start();
 
 app.Run();
