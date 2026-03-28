@@ -97,6 +97,7 @@ echo -e "${YELLOW}Issuing certificate for $DOMAIN...${NC}"
   -d "$DOMAIN" \
   -w "$WEBROOT" \
   --keylength ec-256
+  --force
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}Certificate issue failed${NC}"
