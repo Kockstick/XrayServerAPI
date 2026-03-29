@@ -21,8 +21,7 @@ public class KeyController : Controller
         return Ok("Its worked");
     }
 
-    [HttpPost]
-    [ActionName("access-keys")]
+    [HttpPost("access-keys")]
     public IActionResult CreateKey()
     {
         try
@@ -36,8 +35,7 @@ public class KeyController : Controller
         }
     }
 
-    [HttpDelete]
-    [ActionName("access-keys")]
+    [HttpDelete("access-keys")]
     public IActionResult DeleteKey([FromBody] XrayId xrayId)
     {
         try
@@ -51,8 +49,7 @@ public class KeyController : Controller
         }
     }
 
-    [HttpGet]
-    [ActionName("access-keys")]
+    [HttpGet("access-keys")]
     public IActionResult GetKeys()
     {
         try
@@ -66,8 +63,7 @@ public class KeyController : Controller
         }
     }
 
-    [HttpPut]
-    [ActionName("access-keys")]
+    [HttpPut("access-keys")]
     public IActionResult HasKey([FromBody] XrayId xrayId)
     {
         try
