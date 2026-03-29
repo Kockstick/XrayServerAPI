@@ -96,7 +96,7 @@ echo -e "${YELLOW}Issuing certificate for $DOMAIN...${NC}"
 ~/.acme.sh/acme.sh --issue \
   -d "$DOMAIN" \
   -w "$WEBROOT" \
-  --keylength ec-256
+  --keylength ec-256 \
   --force
 
 if [ $? -ne 0 ]; then
