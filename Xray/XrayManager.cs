@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XrayServerAPI.Xray;
@@ -7,6 +9,7 @@ namespace XrayServerAPI.Xray;
 public class XrayManager
 {
     private static readonly object _lock = new();
+    private const string ConfigPath = "/home/XrayServerAPI/out/xrayconf.json";
 
     public XrayKey CreateKey()
     {
@@ -14,34 +17,16 @@ public class XrayManager
         {
             var key = GenerateKey();
 
-            var path = "/home/XrayServerAPI/out/xrayconf.json";
+            var root = LoadJson();
 
-            var json = File.ReadAllText(path);
+            var clients = GetClientsArray(root);
 
-            var config = System.Text.Json.JsonSerializer.Deserialize<XrayConfig>(json,
-                new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                }) ?? throw new Exception("Failed parse xray config");
-
-            var inbound = config.Inbounds
-                .FirstOrDefault(x => x.Protocol == "vless");
-
-            if (inbound == null)
-                throw new Exception("VLESS inbound not found");
-
-            inbound.Settings.Clients.Add(new Client
+            clients.Add(new JsonObject
             {
-                Id = key.Id
+                ["id"] = key.Id
             });
 
-            var newJson = System.Text.Json.JsonSerializer.Serialize(config,
-                new System.Text.Json.JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-            File.WriteAllText(path, newJson);
+            SaveJson(root);
 
             RestartXray();
 
@@ -53,39 +38,19 @@ public class XrayManager
     {
         lock (_lock)
         {
-            var path = "/home/XrayServerAPI/out/xrayconf.json";
+            var root = LoadJson();
 
-            var json = System.IO.File.ReadAllText(path);
+            var clients = GetClientsArray(root);
 
-            var config = System.Text.Json.JsonSerializer.Deserialize<XrayConfig>(json,
-                new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                }) ?? throw new Exception("Failed parse xray config");
-
-            var inbound = config.Inbounds
-                .FirstOrDefault(x => x.Protocol == "vless");
-
-            if (inbound == null)
-                throw new Exception("VLESS inbound not found");
-
-            inbound.Settings.Clients ??= new List<Client>();
-
-            var client = inbound.Settings.Clients
-                .FirstOrDefault(x => x.Id == id);
+            var client = clients
+                .FirstOrDefault(x => x?["id"]?.ToString() == id);
 
             if (client == null)
                 return null;
 
-            inbound.Settings.Clients.Remove(client);
+            clients.Remove(client);
 
-            var newJson = System.Text.Json.JsonSerializer.Serialize(config,
-                new System.Text.Json.JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-            System.IO.File.WriteAllText(path, newJson);
+            SaveJson(root);
 
             RestartXray();
 
@@ -95,55 +60,65 @@ public class XrayManager
 
     public bool HasKey(string id)
     {
-        var path = "/home/XrayServerAPI/out/xrayconf.json";
+        var root = LoadJson();
 
-        var json = System.IO.File.ReadAllText(path);
+        var clients = GetClientsArray(root);
 
-        var config = System.Text.Json.JsonSerializer.Deserialize<XrayConfig>(json,
-            new System.Text.Json.JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }) ?? throw new Exception("Failed parse xray config");
-
-        var inbound = config.Inbounds
-            .FirstOrDefault(x => x.Protocol == "vless");
-
-        if (inbound == null)
-            return false;
-
-        return inbound.Settings.Clients?
-            .Any(x => x.Id == id) == true;
+        return clients.Any(x => x?["id"]?.ToString() == id);
     }
 
     public List<XrayKey> GetKeys()
     {
         lock (_lock)
         {
-            var path = "/home/XrayServerAPI/out/xrayconf.json";
+            var root = LoadJson();
 
-            var json = File.ReadAllText(path);
+            var clients = GetClientsArray(root);
 
-            var config = System.Text.Json.JsonSerializer.Deserialize<XrayConfig>(json,
-                new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                }) ?? throw new Exception("Failed parse xray config");
-
-            var inbound = config.Inbounds
-                .FirstOrDefault(x => x.Protocol == "vless");
-
-            if (inbound == null)
-                return new List<XrayKey>();
-
-            if (inbound.Settings.Clients == null)
-                return new List<XrayKey>();
-
-            var result = inbound.Settings.Clients
-                .Select(c => GetKey(c.Id))
+            return clients
+                .Where(x => x?["id"] != null)
+                .Select(x => GetKey(x!["id"]!.ToString()))
                 .ToList();
-
-            return result;
         }
+    }
+
+    private JsonNode LoadJson()
+    {
+        var json = File.ReadAllText(ConfigPath);
+        return JsonNode.Parse(json) ?? throw new Exception("Failed parse json");
+    }
+
+    private void SaveJson(JsonNode root)
+    {
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
+        File.WriteAllText(ConfigPath, root.ToJsonString(options));
+    }
+
+    private JsonArray GetClientsArray(JsonNode root)
+    {
+        var inbounds = root["inbounds"]?.AsArray()
+            ?? throw new Exception("inbounds not found");
+
+        var vless = inbounds
+            .FirstOrDefault(x => x?["protocol"]?.ToString() == "vless")
+            ?? throw new Exception("VLESS inbound not found");
+
+        var settings = vless["settings"]
+            ?? throw new Exception("settings not found");
+
+        var clients = settings["clients"] as JsonArray;
+
+        if (clients == null)
+        {
+            clients = new JsonArray();
+            settings["clients"] = clients;
+        }
+
+        return clients;
     }
 
     private XrayKey GenerateKey()
