@@ -1,8 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XrayServerAPI.Xray;
 
@@ -129,29 +127,50 @@ public class XrayManager
 
     private XrayKey GetKey(string uuid)
     {
-        var dataPath = "/home/XrayServerAPI/out/data/xray_data.json";
-        var json = System.IO.File.ReadAllText(dataPath) ??
-            throw new Exception("Xray data file not found");
+        var json = File.ReadAllText(ConfigPath);
 
-        var data = System.Text.Json.JsonSerializer.Deserialize<XrayData>(json)
-            ?? throw new Exception("Failed get XrayData");
+        var root = JsonNode.Parse(json)
+            ?? throw new Exception("Failed parse config");
 
-        var host = data.Domain;
-        var port = 1443;
+        var inbounds = root["inbounds"]?.AsArray()
+            ?? throw new Exception("inbounds not found");
+
+        var vless = inbounds
+            .FirstOrDefault(x => x?["protocol"]?.ToString() == "vless")
+            ?? throw new Exception("vless inbound not found");
+
+        var port = vless["port"]?.GetValue<int>()
+            ?? throw new Exception("port not found");
+
+        var reality = vless["streamSettings"]?["realitySettings"]
+            ?? throw new Exception("realitySettings not found");
+
+        var publicKey = reality["publicKey"]?.ToString()
+            ?? throw new Exception("publicKey not found");
+
+        var shortId = reality["shortIds"]?.AsArray()?.FirstOrDefault()?.ToString()
+            ?? throw new Exception("shortId not found");
+
+        var host = Environment.GetEnvironmentVariable("DOMAIN")
+            ?? throw new Exception("DOMAIN not set");
+
+        var serverName = reality["serverNames"]?.AsArray()?.FirstOrDefault()?.ToString()
+            ?? throw new Exception("serverName not found");
 
         var accessKey =
             $"vless://{uuid}@{host}:{port}" +
             $"?encryption=none" +
-            $"&type=raw" +
+            $"&type=tcp" +
             $"&security=reality" +
             $"&fp=chrome" +
-            $"&sni=speed.cloudflare.com" +
-            $"&pbk={data.Hash32}" +
-            $"&sid={data.ShortId}" +
+            $"&sni={serverName}" +
+            $"&pbk={publicKey}" +
+            $"&sid={shortId}" +
             $"#divpn";
 
         return new XrayKey
         {
+            Id = uuid,
             Host = host,
             Port = port,
             AccessKey = accessKey
