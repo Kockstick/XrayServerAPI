@@ -10,10 +10,12 @@ namespace XrayServerAPI.Controllers;
 public class KeyController : Controller
 {
     private XrayManager xrayManager { get; set; }
+    private ILogger<KeyController> logger { get; set; }
 
-    public KeyController(XrayManager xrayManager)
+    public KeyController(XrayManager xrayManager, ILogger<KeyController> logger)
     {
         this.xrayManager = xrayManager;
+        this.logger = logger;
     }
 
     public ActionResult Index()
@@ -31,6 +33,7 @@ public class KeyController : Controller
         } 
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error create key");
             return Problem("Error create key");
         }
     }
@@ -45,6 +48,7 @@ public class KeyController : Controller
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error delete key");
             return Problem("Error delete key");
         }
     }
@@ -59,6 +63,7 @@ public class KeyController : Controller
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error get keys");
             return Problem("Error get keys");
         }
     }
@@ -73,6 +78,7 @@ public class KeyController : Controller
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "Error check key");
             return Problem("Error check key");
         }
     }

@@ -28,6 +28,9 @@ builder.Services.AddOpenApi();
 
 builder.WebHost.UseUrls("http://127.0.0.1:5000");
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
