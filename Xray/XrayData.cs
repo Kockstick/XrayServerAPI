@@ -6,4 +6,6 @@ public class XrayData
     public string PrivateKey { get; set; }
     public string Hash32 { get; set; }   // PublicKey
     public string ShortId { get; set; }
+
+    public string PublicKey => Hash32;
 }

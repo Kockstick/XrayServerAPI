@@ -127,35 +127,18 @@ public class XrayManager
 
     private XrayKey GetKey(string uuid)
     {
-        var json = File.ReadAllText(ConfigPath);
+        var dataPath = "/home/XrayServerAPI/out/data/xray_data.json";
 
-        var root = JsonNode.Parse(json)
-            ?? throw new Exception("Failed parse config");
+        var json = File.ReadAllText(dataPath)
+            ?? throw new Exception("Xray data file not found");
+        if(json == "")
+            throw new Exception("Xray data file is empty");
 
-        var inbounds = root["inbounds"]?.AsArray()
-            ?? throw new Exception("inbounds not found");
+        var data = System.Text.Json.JsonSerializer.Deserialize<XrayData>(json)
+            ?? throw new Exception("Failed get XrayData");
 
-        var vless = inbounds
-            .FirstOrDefault(x => x?["protocol"]?.ToString() == "vless")
-            ?? throw new Exception("vless inbound not found");
-
-        var port = vless["port"]?.GetValue<int>()
-            ?? throw new Exception("port not found");
-
-        var reality = vless["streamSettings"]?["realitySettings"]
-            ?? throw new Exception("realitySettings not found");
-
-        var publicKey = reality["publicKey"]?.ToString()
-            ?? throw new Exception("publicKey not found");
-
-        var shortId = reality["shortIds"]?.AsArray()?.FirstOrDefault()?.ToString()
-            ?? throw new Exception("shortId not found");
-
-        var host = Environment.GetEnvironmentVariable("DOMAIN")
-            ?? throw new Exception("DOMAIN not set");
-
-        var serverName = reality["serverNames"]?.AsArray()?.FirstOrDefault()?.ToString()
-            ?? throw new Exception("serverName not found");
+        var host = data.Domain;
+        var port = 1443;
 
         var accessKey =
             $"vless://{uuid}@{host}:{port}" +
@@ -163,9 +146,9 @@ public class XrayManager
             $"&type=tcp" +
             $"&security=reality" +
             $"&fp=chrome" +
-            $"&sni={serverName}" +
-            $"&pbk={publicKey}" +
-            $"&sid={shortId}" +
+            $"&sni=speed.cloudflare.com" +
+            $"&pbk={data.PublicKey}" +
+            $"&sid={data.ShortId}" +
             $"#divpn";
 
         return new XrayKey
