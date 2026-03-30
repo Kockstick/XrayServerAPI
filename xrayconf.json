@@ -1,8 +1,8 @@
 {
   "log": {
     "loglevel": "warning",
-    "access": "/home/vpsadmin/xray_log/access.log",
-    "error": "/home/vpsadmin/xray_log/error.log"
+    "access": "/home/XrayServerAPI/out/logs/access.log",
+    "error": "/home/XrayServerAPI/out/logs/error.log"
   },
 
   "dns": {
@@ -36,11 +36,11 @@
     {
       "listen": "127.0.0.1",
       "tag": "dokodemo-in",
-      "port": 14431,
+      "port": 4431,
       "protocol": "dokodemo-door",
       "settings": {
         "address": "speed.cloudflare.com",
-        "port": 1443,
+        "port": 8443,
         "network": "tcp"
       },
       "sniffing": {
@@ -53,7 +53,7 @@
     },
     {
       "listen": "0.0.0.0",
-      "port": 1443,
+      "port": 8443,
       "protocol": "vless",
       "settings": {
         "clients": [
