@@ -138,7 +138,7 @@ public class XrayManager
             ?? throw new Exception("Failed get XrayData");
 
         var host = data.Domain;
-        var port = 1443;
+        var port = 8443;
 
         var accessKey =
             $"vless://{uuid}@{host}:{port}" +
