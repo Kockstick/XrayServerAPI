@@ -34,7 +34,8 @@ fi
 
 echo -e "${YELLOW}Configuring systemd service...${NC}"
 
-ufw allow 8443
+sudo ufw --force enable
+sudo ufw allow 8443/tcp
 
 sudo tee /etc/systemd/system/xray.service > /dev/null <<EOF
 [Unit]
@@ -53,11 +54,7 @@ LimitNOFILE=1000000
 WantedBy=multi-user.target
 EOF
 
-sudo bash -c cat > /etc/systemd/system/xray.service.d/10-donot_touch_single_conf.conf <<EOF
-[Service]
-ExecStart=
-ExecStart=/usr/local/bin/xray run -config /home/XrayServerAPI/out/xrayconf.json
-EOF
+sudo rm -f /etc/systemd/system/xray.service.d/10-donot_touch_single_conf.conf
 
 echo -e "${YELLOW}Preparing directories...${NC}"
 
@@ -109,6 +106,7 @@ sed -i "s|CLIENT_UUID|$TEMP_UUID|g" "$TMP_CONFIG"
 sudo mv "$TMP_CONFIG" "$XRAY_CONFIG"
 
 echo -e "${YELLOW}Restarting Xray...${NC}"
+sudo systemctl daemon-reload
 sudo systemctl restart xray
 
 echo -e "${GREEN}=== XRAY INSTALLED ===${NC}"
