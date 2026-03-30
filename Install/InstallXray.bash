@@ -32,6 +32,27 @@ if ! command -v xray &> /dev/null; then
   rm install-release.sh
 fi
 
+echo -e "${YELLOW}Configuring systemd service...${NC}"
+
+ufw allow 8443
+
+sudo tee /etc/systemd/system/xray.service > /dev/null <<EOF
+[Unit]
+Description=Xray Service
+Documentation=https://github.com/xtls
+After=network.target nss-lookup.target
+
+[Service]
+User=root
+ExecStart=/usr/local/bin/xray run -config ${XRAY_CONFIG}
+Restart=on-failure
+LimitNPROC=10000
+LimitNOFILE=1000000
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 echo -e "${YELLOW}Preparing directories...${NC}"
 
 touch "$LOG_DIR/access.log" "$LOG_DIR/error.log"
