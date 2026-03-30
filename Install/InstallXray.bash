@@ -54,7 +54,11 @@ LimitNOFILE=1000000
 WantedBy=multi-user.target
 EOF
 
-sudo rm -f /etc/systemd/system/xray.service.d/10-donot_touch_single_conf.conf
+sudo bash -c cat > /etc/systemd/system/xray.service.d/10-donot_touch_single_conf.conf <<EOF
+[Service]
+ExecStart=
+ExecStart=/usr/local/bin/xray run -config /home/XrayServerAPI/out/xrayconf.json
+EOF
 
 echo -e "${YELLOW}Preparing directories...${NC}"
 
