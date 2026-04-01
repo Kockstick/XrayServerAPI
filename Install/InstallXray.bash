@@ -82,9 +82,9 @@ TEMP_UUID=$(xray uuid)
 
 echo -e "${YELLOW}Generating Reality keys...${NC}"
 KEYS=$(/usr/local/bin/xray x25519)
-PRIVATE_KEY=$(echo "$KEYS" | grep "PrivateKey" | awk '{print $2}')
-PASSWORD=$(echo "$KEYS" | grep "Password" | awk -F': ' '{print $2}')
-HASH32=$(echo "$KEYS" | grep "Hash32" | awk '{print $2}')
+PRIVATE_KEY=$(echo "$KEYS" | grep "PrivateKey" | cut -d':' -f2- | xargs)
+PASSWORD=$(echo "$KEYS" | grep "Password" | cut -d':' -f2- | xargs)
+HASH32=$(echo "$KEYS" | grep "Hash32" | cut -d':' -f2- | xargs)
 
 echo -e "${YELLOW}Saving credentials...${NC}"
 
