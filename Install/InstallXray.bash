@@ -92,8 +92,8 @@ cat > "$DATA_FILE" <<EOF
 {
   "domain": "$DOMAIN",
   "privateKey": "$PRIVATE_KEY",
-  "password": "$(echo "$KEYS" | grep "Password" | awk '{print $2}')",
-  "hash32": "$(echo "$KEYS" | grep "Hash32" | awk '{print $2}')",
+  "password": "$PASSWORD",
+  "hash32": "$HASH32",
   "shortId": "$SHORT_ID"
 }
 EOF
