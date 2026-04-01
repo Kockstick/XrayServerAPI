@@ -34,8 +34,7 @@ fi
 
 echo -e "${YELLOW}Configuring systemd service...${NC}"
 
-sudo ufw --force enable
-sudo ufw allow 8443/tcp
+ufw allow 8443/tcp
 
 sudo tee /etc/systemd/system/xray.service > /dev/null <<EOF
 [Unit]
