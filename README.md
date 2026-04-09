@@ -73,7 +73,7 @@ public class XrayKey
 XrayKey?
 ```
 
-### HttpGet возвразает список ключей
+### HttpGet возвращает список ключей
 Возвращает список ключей
 ```
 List<XrayKey>? keys
